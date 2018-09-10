@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Cors;
 using FarmerAPI.Filters;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using FarmerAPI.Hubs;
 
 namespace FarmerAPI.Controllers
 {    
@@ -16,12 +18,14 @@ namespace FarmerAPI.Controllers
     //[EnableCors("AllowAllOrigins")] //在Startup.cs做全域設定
     public class ValuesController : Controller
     {
-
         private readonly WeatherContext _context;
-        public ValuesController(WeatherContext context)
+		private readonly IHubContext<WeatherHub> _weatherHub;
+
+		public ValuesController(WeatherContext context, IHubContext<WeatherHub> weatherHub)
         {
             _context = context;
-        }
+			_weatherHub = weatherHub;
+		}
 
         // /api/values/Realtime/1
         //[AuthorizationFilter]
@@ -54,7 +58,7 @@ namespace FarmerAPI.Controllers
         // This action at /api/values/Realtime/5 can bind form data (set individual parameters in body)
         // Content-Type: application/json, x-www-form-urlencoded is working
         [HttpPut("[action]/{StationId}")]
-        public void Realtime(int StationId, decimal RecTemp = -1, decimal RecRH = -1)
+        public async Task Realtime(int StationId, decimal RecTemp = -1, decimal RecRH = -1)
         {
             if (StationExists(StationId))
             {
@@ -66,7 +70,8 @@ namespace FarmerAPI.Controllers
                 try
                 {
                     _context.SaveChanges();
-                }
+					await _weatherHub.Clients.All.SendAsync("TempRhSensorReceived", StationId, RecTemp, RecRH);
+				}
                 catch(DbUpdateConcurrencyException)
                 {
                     throw;

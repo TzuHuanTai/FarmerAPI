@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using FarmerAPI.Models;
 using FarmerAPI.ViewModels;
 
-namespace FarmerWeb.Controllers
+namespace FarmerAPI.Controllers
 {
     
     //[Produces("application/json")]

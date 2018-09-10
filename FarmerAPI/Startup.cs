@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using FarmerAPI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using FarmerAPI.Hubs;
 
 namespace FarmerAPI
 {
@@ -179,18 +180,21 @@ namespace FarmerAPI
                 options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAllOrigins"));
             });
 
-            //----權限(AddAuthorization)，設定Attribute放在Action上做篩選----//
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("AdministratorUser", policy => {
-            //        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-            //        policy.RequireAuthenticatedUser();
-            //        policy.RequireClaim(JwtClaimTypes.Role, "1");
-            //    });
-            //    //options.AddPolicy("GeneralUser", policy => policy.RequireClaim(JwtClaimTypes.Role, "2"));
-            //});    
-            //註冊認證，讓所有API Method可做權限控管
-            services.AddMvc(Configuration =>
+			//----加入SignalR廣播----//
+			services.AddSignalR();
+
+			//----權限(AddAuthorization)，設定Attribute放在Action上做篩選----//
+			//services.AddAuthorization(options =>
+			//{
+			//    options.AddPolicy("AdministratorUser", policy => {
+			//        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+			//        policy.RequireAuthenticatedUser();
+			//        policy.RequireClaim(JwtClaimTypes.Role, "1");
+			//    });
+			//    //options.AddPolicy("GeneralUser", policy => policy.RequireClaim(JwtClaimTypes.Role, "2"));
+			//});    
+			//註冊認證，讓所有API Method可做權限控管
+			services.AddMvc(Configuration =>
             {
                 //AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
                 //                .RequireAuthenticatedUser()
@@ -218,18 +222,26 @@ namespace FarmerAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            //----網域需要在指定條件----//
-            app.UseCors("AllowAllOrigins");
+			app.UseDefaultFiles();
+			app.UseStaticFiles();
+			app.UseWebSockets();
+
+			//----網域需要在指定條件----//
+			app.UseCors("AllowAllOrigins");
 
             //----需要驗證JWT權限----//
             app.UseAuthentication();
-            
-            //----個別Controller註冊Middleware Filter，驗證身分權限----//
-            //app.UseMiddleware<xxxxFilter>();
-            //app.UseMiddleware<>
 
-            //----請求進入MVC，放在所有流程最後面----//
-            app.UseMvc();            
+			//----個別Controller註冊Middleware Filter，驗證身分權限----//
+			//app.UseMiddleware<xxxxFilter>();
+			//app.UseMiddleware<>
+
+			app.UseSignalR(routes => {
+				routes.MapHub<WeatherHub>("/weatherHub");
+			});
+
+			//----請求進入MVC，放在所有流程最後面----//
+			app.UseMvc();            
         }
     }
 }
