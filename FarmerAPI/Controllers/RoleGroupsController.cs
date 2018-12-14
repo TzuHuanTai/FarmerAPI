@@ -157,7 +157,7 @@ namespace FarmerAPI.Controllers
                 }
             }
 
-            return CreatedAtAction("GetRoleGroup", new { id = roleGroup.RoleId }, roleGroup);
+            return CreatedAtAction("GetRoleGroup", new { StationId = roleGroup.RoleId }, roleGroup);
         }
 
         // DELETE: api/RoleGroups/5

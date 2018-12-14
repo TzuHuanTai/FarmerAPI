@@ -93,7 +93,7 @@ namespace FarmerAPI.Controllers
             _context.Ctrl.Add(ctrl);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCtrl", new { id = ctrl.Id }, ctrl);
+            return CreatedAtAction("GetCtrl", new { StationId = ctrl.Id }, ctrl);
         }
 
         // DELETE: api/Ctrls/5

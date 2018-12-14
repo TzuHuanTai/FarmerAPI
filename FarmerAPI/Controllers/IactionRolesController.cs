@@ -72,7 +72,7 @@ namespace FarmerAPI.Controllers
                 }
             }
 
-            return CreatedAtAction("GetIactionRole", new { id = iactionRole.ActionId }, iactionRole);
+            return CreatedAtAction("GetIactionRole", new { StationId = iactionRole.ActionId }, iactionRole);
         }
 
         // DELETE: api/IactionRoles/5

@@ -30,11 +30,11 @@ namespace FarmerAPI.ViewModels
 
     public class vmRealtime
     {
-        public string DateFormatted { get; set; }
+        public DateTime DateFormatted { get; set; }
         public int StationId { get; set; }
         public string StationName { get; set; }
         public decimal? RecTemp { get; set; }
         public decimal? RecRH { get; set; }
-
-    }
+		public decimal? Lux { get; set; }
+	}
 }

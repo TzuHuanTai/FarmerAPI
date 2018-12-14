@@ -12,10 +12,10 @@ namespace FarmerAPI.Controllers
     
     //[Produces("application/json")]
     [Route("api/[controller]")]
-    public class WeatherDataController : Controller
+    public class ClimateController : Controller
     {
         private readonly WeatherContext _context;
-        public WeatherDataController(WeatherContext context)
+        public ClimateController(WeatherContext context)
         {
             _context = context;
         }
@@ -24,7 +24,7 @@ namespace FarmerAPI.Controllers
         public IEnumerable<vmWeatherTemperature> Temperatures(int? StationId = 1, int SearchNum = 10000)
         {
             //DB抓資料出來
-            IEnumerable<WeatherData> DbWeatherData = _context.WeatherData.Where(x => x.StationNum == StationId).Take(SearchNum).OrderBy(x=>x.ObsTime);
+            IEnumerable<WeatherData> DbWeatherData = _context.WeatherData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x=>x.ObsTime);
 
             List<vmWeatherTemperature> ReturnTemperature = new List<vmWeatherTemperature>();
 
@@ -43,7 +43,7 @@ namespace FarmerAPI.Controllers
         public IEnumerable<vmWeatherHumidities> Humidities(int? StationId = 1, int SearchNum = 10000)
         {
             //DB抓資料出來
-            IEnumerable<WeatherData> DbWeatherData = _context.WeatherData.Where(x => x.StationNum == StationId).Take(SearchNum).OrderBy(x => x.ObsTime);
+            IEnumerable<WeatherData> DbWeatherData = _context.WeatherData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x => x.ObsTime);
 
             List<vmWeatherHumidities> ReturnHumidities = new List<vmWeatherHumidities>();
 
@@ -76,6 +76,9 @@ namespace FarmerAPI.Controllers
             };
             return ReturnStations;
         }
+
+
+
       
     }
 }

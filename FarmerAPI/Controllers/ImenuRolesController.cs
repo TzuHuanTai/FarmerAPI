@@ -72,7 +72,7 @@ namespace FarmerAPI.Controllers
                 }
             }
 
-            return CreatedAtAction("GetImenuRole", new { id = imenuRole.MenuId }, imenuRole);
+            return CreatedAtAction("GetImenuRole", new { StationId = imenuRole.MenuId }, imenuRole);
         }
 
         // DELETE: api/ImenuRoles/5

@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using FarmerAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +19,7 @@ using FarmerAPI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using FarmerAPI.Hubs;
+using FarmerAPI.Services;
 
 namespace FarmerAPI
 {
@@ -72,13 +71,7 @@ namespace FarmerAPI
             ));
             services.AddDbContext<KMVContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("frudat")
-            ));
-            services.AddDbContext<SystemStructureContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("MyDB2")
-            ));
-            services.AddDbContext<SystemStructure2Context>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("MyDB2")
-            ));                     
+            ));                               
 
             //----加入cross-origin-request-sharing----//
             services.AddCors(options=>
@@ -212,7 +205,10 @@ namespace FarmerAPI
             //註冊，若只註冊需自行在controll加上標籤[ServiceFilter(typeof(AuthorizationFilter))]
             //AddSingleto failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
             services.AddScoped<AuthorizationFilter>();
-        }
+
+			//----MongoDB----//
+			services.AddScoped<WeatherService>();
+		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

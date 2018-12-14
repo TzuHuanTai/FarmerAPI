@@ -5,7 +5,7 @@ namespace FarmerAPI.Models
 {
     public partial class WeatherData
     {
-        public int StationNum { get; set; }
+        public int StationId { get; set; }
         public DateTime ObsTime { get; set; }
         public decimal? StnPres { get; set; }
         public decimal? SeaPres { get; set; }
@@ -22,6 +22,6 @@ namespace FarmerAPI.Models
         public decimal? GlobalRad { get; set; }
         public decimal? Visb { get; set; }
 
-        public StationInfo StationNumNavigation { get; set; }
+        public StationInfo StationIdNavigation { get; set; }
     }
 }

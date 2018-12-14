@@ -210,7 +210,11 @@ namespace FarmerAPI.Models
                     .HasColumnName("RH")
                     .HasColumnType("decimal?(5, 2)");
 
-                entity.Property(e => e.Temperature).HasColumnType("decimal?(5, 2)");
+				entity.Property(e => e.Lux)
+					.HasColumnName("Lux")
+					.HasColumnType("decimal?(5, 2)");
+
+				entity.Property(e => e.Temperature).HasColumnType("decimal?(5, 2)");
             });
 
             modelBuilder.Entity<RoleGroup>(entity =>
@@ -305,7 +309,7 @@ namespace FarmerAPI.Models
 
             modelBuilder.Entity<WeatherData>(entity =>
             {
-                entity.HasKey(e => new { e.StationNum, e.ObsTime });
+                entity.HasKey(e => new { e.StationId, e.ObsTime });
 
                 entity.Property(e => e.ObsTime).HasColumnType("datetime");
 
@@ -347,9 +351,9 @@ namespace FarmerAPI.Models
                     .HasColumnName("WSGust")
                     .HasColumnType("decimal?(3, 1)");
 
-                entity.HasOne(d => d.StationNumNavigation)
+                entity.HasOne(d => d.StationIdNavigation)
                     .WithMany(p => p.WeatherData)
-                    .HasForeignKey(d => d.StationNum)
+                    .HasForeignKey(d => d.StationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_WeatherData_StationInfo");
             });

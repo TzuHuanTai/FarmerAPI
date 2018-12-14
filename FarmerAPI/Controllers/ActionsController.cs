@@ -133,7 +133,7 @@ namespace FarmerAPI.Controllers
             _context.Actions.Add(actions);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetActions", new { id = actions.Id }, actions);
+            return CreatedAtAction("GetActions", new { StationId = actions.Id }, actions);
         }
 
         // DELETE: api/Actions/5

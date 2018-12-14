@@ -158,7 +158,7 @@ namespace FarmerAPI.Controllers
                 }
             }
 
-            return CreatedAtAction("GetMenu", new { id = menu.MenuId }, menu);
+            return CreatedAtAction("GetMenu", new { StationId = menu.MenuId }, menu);
         }
 
         // DELETE: api/Menus/5
