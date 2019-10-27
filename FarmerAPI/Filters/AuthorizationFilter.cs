@@ -83,7 +83,7 @@ namespace FarmerAPI.Filters
                     FailAuthorize(context);
                 }
             }
-            else if (authHeader == null) //Guest & Anonymous without authorized header
+            else //Guest & Anonymous without authorized header
             {
                 //沒有帶入header，userRole預設是0，對照database Guest角色代號0
                 if (HasAllowedAction(userRole, accessAction))

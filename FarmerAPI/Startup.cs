@@ -102,75 +102,6 @@ namespace FarmerAPI
                                .WithExposedHeaders("Content-Disposition"); // content-disposition is *exposed* (and allowed because of AllowAnyHeader)
                     });
                 // END02
-
-                // BEGIN03
-                options.AddPolicy("AllowSpecificMethods",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://example.com")
-                               .WithMethods("GET", "POST", "HEAD");
-                    });
-                // END03
-
-                // BEGIN04
-                options.AddPolicy("AllowAllMethods",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://example.com")
-                               .AllowAnyMethod();
-                    });
-                // END04
-
-                // BEGIN05
-                options.AddPolicy("AllowHeaders",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://example.com")
-                               .WithHeaders("accept", "content-type", "origin", "x-custom-header");
-                    });
-                // END05
-
-                // BEGIN06
-                options.AddPolicy("AllowAllHeaders",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://example.com")
-                               .AllowAnyHeader();
-                    });
-                // END06
-
-                // BEGIN07
-                options.AddPolicy("ExposeResponseHeaders",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://example.com")
-                               .WithExposedHeaders("x-custom-header");
-                    });
-                // END07
-
-                // BEGIN08
-                options.AddPolicy("AllowCredentials",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://example.com")
-                               .AllowCredentials();
-                    });
-                // END08
-
-                // BEGIN09
-                options.AddPolicy("SetPreflightExpiration",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://example.com")
-                               .SetPreflightMaxAge(TimeSpan.FromSeconds(2520));
-                    });
-                // END09
-            });
-
-
-            services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAllOrigins"));
             });
 
 			//----加入SignalR廣播----//
@@ -186,7 +117,8 @@ namespace FarmerAPI
 			//    });
 			//    //options.AddPolicy("GeneralUser", policy => policy.RequireClaim(JwtClaimTypes.Role, "2"));
 			//});    
-			//註冊認證，讓所有API Method可做權限控管
+
+			//----註冊認證，讓所有API Method可做權限控管----//
 			services.AddMvc(Configuration =>
             {
                 //AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
@@ -202,12 +134,12 @@ namespace FarmerAPI
             });
 
             //----Filter----//
-            //註冊，若只註冊需自行在controll加上標籤[ServiceFilter(typeof(AuthorizationFilter))]
-            //AddSingleto failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
+            //註冊，若只個別註冊需自行在controll加上標籤[ServiceFilter(typeof(AuthorizationFilter))]
+            //AddSingleton failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
             services.AddScoped<AuthorizationFilter>();
 
 			//----MongoDB----//
-			services.AddScoped<WeatherService>();
+			services.AddSingleton<WeatherService>();
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -217,16 +149,15 @@ namespace FarmerAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-
-			app.UseDefaultFiles();
-			app.UseStaticFiles();
-			app.UseWebSockets();
-
 			//----網域需要在指定條件----//
 			app.UseCors("AllowAllOrigins");
 
             //----需要驗證JWT權限----//
             app.UseAuthentication();
+
+			app.UseDefaultFiles();
+			app.UseStaticFiles();
+			app.UseWebSockets();
 
 			//----個別Controller註冊Middleware Filter，驗證身分權限----//
 			//app.UseMiddleware<xxxxFilter>();
