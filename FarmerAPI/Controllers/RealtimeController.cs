@@ -67,7 +67,7 @@ namespace FarmerAPI.Controllers
             }            
         }
 
-		// This action at /api/values/Realtime/5 can bind form data (set individual parameters in body)
+		// This action at /api/Realtime/5 can bind form data (set individual parameters in body)
 		// Content-Type: application/json, x-www-form-urlencoded is working
 		// Insert/Update database realtime table through the recieved data on Raspberry pi DHT22 sensor.
 		[HttpPut("{StationId}")]
@@ -78,30 +78,34 @@ namespace FarmerAPI.Controllers
 				return BadRequest();
 			}
 
-            if (StationExists(SensorData.StationId))
-            {                
-                try
-                {
-					// save into RMSDB
-					RealTime TargetStation = _context.RealTime.SingleOrDefault(x => x.Id == SensorData.StationId);
-					_context.Entry(TargetStation).State = EntityState.Modified;
-					TargetStation.Temperature = SensorData.Temperature;
-					TargetStation.Rh = SensorData.RH;
-					TargetStation.Lux = SensorData.Lux;
-					_context.SaveChanges();
+			using(var transection = _context.Database.BeginTransaction())
+			{
+				if (StationExists(SensorData.StationId))
+				{
+					try
+					{
+						// save into RMSDB
+						RealTime TargetStation = _context.RealTime.SingleOrDefault(x => x.Id == SensorData.StationId);
+						_context.Entry(TargetStation).State = EntityState.Modified;
+						TargetStation.Temperature = SensorData.Temperature;
+						TargetStation.Rh = SensorData.RH;
+						TargetStation.Lux = SensorData.Lux;
+						_context.SaveChanges();
 
-					// save into mongoDb					
-					await PostRealtime(StationId, SensorData);
-				
-					// Broadcast by SignalR
-					await _weatherHub.Clients.All.SendAsync("TempRhSensorReceived", SensorData);
+						// save into mongoDb					
+						await PostRealtime(StationId, SensorData);
+
+						// Broadcast by SignalR
+						await _weatherHub.Clients.All.SendAsync("TempRhSensorReceived", SensorData);
+						transection.Commit();
+					}
+					catch (DbUpdateConcurrencyException)
+					{
+						return BadRequest("Rollback");
+					}
 				}
-                catch(DbUpdateConcurrencyException)
-                {
-                    throw;
-                }
-            }
-			return NoContent();
+				return Ok();
+			}
         }
 
 		//新增資料進入MongoDB

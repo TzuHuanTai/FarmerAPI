@@ -67,10 +67,9 @@ namespace FarmerAPI.Filters
                 //string usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
 
                                                             
-                List<int> RoleID = _context.ImemRole
+                IQueryable<int> RoleID = _context.ImemRole.AsNoTracking()
                     .Where(y => y.Account == userAccount)
-                    .Select(x => x.RoleId)
-                    .ToList();
+                    .Select(x => x.RoleId);
 
                 //任一角色有權限即可執行Action
                 userRole.AddRange(RoleID);
