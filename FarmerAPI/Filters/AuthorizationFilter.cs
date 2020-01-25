@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using FarmerAPI.Extensions;
-using Microsoft.AspNetCore.Http.Internal;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 

@@ -30,15 +30,13 @@ namespace FarmerAPI.Models
         {
             modelBuilder.Entity<V34>(entity =>
             {
-                entity.HasKey(e => new { e.V3401, e.V3404 })
-                    .ForSqlServerIsClustered(false);
+                entity.HasKey(e => new { e.V3401, e.V3404 });
 
                 entity.ToTable("v34");
 
                 entity.HasIndex(e => new { e.V3401, e.V3404 })
                     .HasName("v34_k")
-                    .IsUnique()
-                    .ForSqlServerIsClustered();
+                    .IsUnique();
 
                 entity.Property(e => e.V3401)
                     .HasColumnName("v34_01")

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.SignalR;
 using FarmerAPI.Hubs;
 using FarmerAPI.Services;
 using FarmerAPI.Models.MongoDB;
+using Microsoft.Extensions.Logging;
 
 namespace FarmerAPI.Controllers
 {    
@@ -23,19 +24,25 @@ namespace FarmerAPI.Controllers
         private readonly WeatherContext _context;
 		private readonly IHubContext<WeatherHub> _weatherHub;
 		private readonly WeatherService _weatherService;
+		private readonly ILogger<RealtimeController> _logger;
 
-		public RealtimeController(WeatherContext context, IHubContext<WeatherHub> weatherHub, WeatherService weatherService)
+		public RealtimeController(WeatherContext context,
+			IHubContext<WeatherHub> weatherHub,
+			ILogger<RealtimeController> logger,
+			WeatherService weatherService)
         {
             _context = context;
 			_weatherHub = weatherHub;
 			_weatherService = weatherService;
+			_logger = logger;
 		}
 
 		// From MongoDB
 		[HttpGet("[action]")]
-		public ActionResult<List<Climate>> GetWeather()
-		{			
-			return _weatherService.Get();
+		public ActionResult GetWeather()
+		{
+			_logger.LogError("hello world!");
+			return Ok(_context.WeatherData.FirstOrDefault());
 		}
 
 		// /api/Realtime/1

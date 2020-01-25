@@ -6,13 +6,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
 using FarmerAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using FarmerAPI.Filters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using FarmerAPI.ViewModels;
@@ -20,6 +16,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using FarmerAPI.Hubs;
 using FarmerAPI.Services;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using NLog.Web;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace FarmerAPI
 {
@@ -98,7 +101,6 @@ namespace FarmerAPI
                         builder.AllowAnyOrigin()
                                .AllowAnyMethod()
                                .AllowAnyHeader()
-                               .AllowCredentials()
                                .WithExposedHeaders("Content-Disposition"); // content-disposition is *exposed* (and allowed because of AllowAnyHeader)
                     });
                 // END02
@@ -107,19 +109,8 @@ namespace FarmerAPI
 			//----加入SignalR廣播----//
 			services.AddSignalR();
 
-			//----權限(AddAuthorization)，設定Attribute放在Action上做篩選----//
-			//services.AddAuthorization(options =>
-			//{
-			//    options.AddPolicy("AdministratorUser", policy => {
-			//        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-			//        policy.RequireAuthenticatedUser();
-			//        policy.RequireClaim(JwtClaimTypes.Role, "1");
-			//    });
-			//    //options.AddPolicy("GeneralUser", policy => policy.RequireClaim(JwtClaimTypes.Role, "2"));
-			//});    
-
 			//----註冊認證，讓所有API Method可做權限控管----//
-			services.AddMvc(Configuration =>
+			services.AddControllers(Configuration =>
             {
                 //AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
                 //                .RequireAuthenticatedUser()
@@ -143,32 +134,35 @@ namespace FarmerAPI
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-			//----網域需要在指定條件----//
-			app.UseCors("AllowAllOrigins");
+
+			app.UseStaticFiles();
+			app.UseDefaultFiles();
+            app.UseRouting();
+
+            //----網域需要在指定條件----//
+            app.UseCors("AllowAllOrigins");
 
             //----需要驗證JWT權限----//
             app.UseAuthentication();
 
-			app.UseDefaultFiles();
-			app.UseStaticFiles();
 			app.UseWebSockets();
 
 			//----個別Controller註冊Middleware Filter，驗證身分權限----//
 			//app.UseMiddleware<xxxxFilter>();
 			//app.UseMiddleware<>
 
-			app.UseSignalR(routes => {
-				routes.MapHub<WeatherHub>("/weatherHub");
-			});
-
-			//----請求進入MVC，放在所有流程最後面----//
-			app.UseMvc();            
+            //----請求進入MVC，放在所有流程最後面----//
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<WeatherHub>("/weatherHub");
+                endpoints.MapControllers();
+            });
         }
     }
 }
