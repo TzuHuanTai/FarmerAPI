@@ -21,6 +21,11 @@ namespace FarmerAPI.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// 查詢使用者清單
+        /// </summary>
+        /// <param name="q">查詢使用者名稱</param>
+        /// <returns>使用者清單</returns>
         [HttpGet("[action]")]
         public IEnumerable<CtrlActionNode> GetActionTree()
         {

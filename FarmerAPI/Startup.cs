@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +23,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Reflection;
 
 namespace FarmerAPI
 {
@@ -65,6 +68,36 @@ namespace FarmerAPI
                 #endregion
             });
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(
+                    // name: 攸關 SwaggerDocument 的 URL 位置。
+                    name: "v1",
+                    // info: 是用於 SwaggerDocument 版本資訊的顯示(內容非必填)。
+                    info: new Info
+                    {
+                        Title = "RESTful API",
+                        Version = "1.2.3",
+                        Description = "This is ASP.NET Core RESTful API.",
+                        TermsOfService = "What is terms of service?",
+                        Contact = new Contact
+                        {
+                            Name = "John Wu",
+                            Url = "https://blog.johnwu.cc"
+                        },
+                        License = new License
+                        {
+                            Name = "CC BY-NC-SA 4.0",
+                            Url = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                        }
+                    }
+                );
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
+
             //----抓封包資訊、client IP需要註冊HttpContext功能----//
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -79,15 +112,6 @@ namespace FarmerAPI
             //----加入cross-origin-request-sharing----//
             services.AddCors(options=>
             {
-                // BEGIN01
-                options.AddPolicy("AllowSpecificOrigins",
-                builder =>
-                {
-                    builder.WithOrigins("http://example.com", "http://www.contoso.com");
-                });
-                // END01
-
-                // BEGIN02
                 options.AddPolicy("AllowAllOrigins",
                     builder =>
                     {
@@ -103,7 +127,6 @@ namespace FarmerAPI
                                .AllowAnyHeader()
                                .WithExposedHeaders("Content-Disposition"); // content-disposition is *exposed* (and allowed because of AllowAnyHeader)
                     });
-                // END02
             });
 
 			//----加入SignalR廣播----//
@@ -112,22 +135,14 @@ namespace FarmerAPI
 			//----註冊認證，讓所有API Method可做權限控管----//
 			services.AddControllers(Configuration =>
             {
-                //AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
-                //                .RequireAuthenticatedUser()
-                //                .Build();
-                //Configuration.Filters.Add(new AuthorizeFilter(policy));
-
-                //全域註冊Filter，靠AuthorizationFilter驗證身分權限                
-                //Configuration.Filters.Add(new AuthorizationFilter());
-
                 //再全域註冊Filter，ServiceFilterAttribute方式會被解析要用dependency injection，這樣就可在filter使用db功能
-                Configuration.Filters.Add(new ServiceFilterAttribute(typeof(AuthorizationFilter)));
+                //Configuration.Filters.Add(new ServiceFilterAttribute(typeof(AuthorizationFilter)));
             });
 
             //----Filter----//
             //註冊，若只個別註冊需自行在controll加上標籤[ServiceFilter(typeof(AuthorizationFilter))]
             //AddSingleton failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
-            services.AddScoped<AuthorizationFilter>();
+            //services.AddScoped<AuthorizationFilter>();
 
 			//----MongoDB----//
 			services.AddSingleton<WeatherService>();
@@ -153,9 +168,16 @@ namespace FarmerAPI
 
 			app.UseWebSockets();
 
-			//----個別Controller註冊Middleware Filter，驗證身分權限----//
-			//app.UseMiddleware<xxxxFilter>();
-			//app.UseMiddleware<>
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint(
+                    // url: 需配合 SwaggerDoc 的 name。 "/swagger/{SwaggerDoc name}/swagger.json"
+                    url: "/swagger/v1/swagger.json",
+                    // description: 用於 Swagger UI 右上角選擇不同版本的 SwaggerDocument 顯示名稱使用。
+                    name: "RESTful API v1.0.0"
+                );
+            });
 
             //----請求進入MVC，放在所有流程最後面----//
             app.UseEndpoints(endpoints =>

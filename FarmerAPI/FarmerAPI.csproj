@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework> 
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\test\FarmerAPI\FarmerAPI.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Models\kmv\" />
     <Folder Include="Templates\" />
@@ -19,6 +23,9 @@
     <PackageReference Include="MongoDB.Driver" Version="2.10.1" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.0" />
+
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="4.0.1" />
   </ItemGroup>
 
 
