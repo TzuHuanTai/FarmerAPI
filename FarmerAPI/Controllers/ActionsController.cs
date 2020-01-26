@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FarmerAPI.Models;
+using FarmerAPI.Models.Weather;
 using FarmerAPI.ViewModels;
 
 namespace FarmerAPI.Controllers

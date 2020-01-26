@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FarmerAPI.Models;
+using FarmerAPI.Models.Weather;
 
 namespace FarmerAPI.ViewModels
 {

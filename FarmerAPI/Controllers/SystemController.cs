@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using FarmerAPI.Models;
+using FarmerAPI.Models.Weather;
 using FarmerAPI.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Cors;
