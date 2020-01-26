@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using FarmerAPI.Models;
+using FarmerAPI.Models.Weather;
 using FarmerAPI.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Cors;
@@ -24,25 +24,14 @@ namespace FarmerAPI.Controllers
         private readonly WeatherContext _context;
 		private readonly IHubContext<WeatherHub> _weatherHub;
 		private readonly WeatherService _weatherService;
-		private readonly ILogger<RealtimeController> _logger;
 
 		public RealtimeController(WeatherContext context,
 			IHubContext<WeatherHub> weatherHub,
-			ILogger<RealtimeController> logger,
 			WeatherService weatherService)
         {
             _context = context;
 			_weatherHub = weatherHub;
 			_weatherService = weatherService;
-			_logger = logger;
-		}
-
-		// From MongoDB
-		[HttpGet("[action]")]
-		public ActionResult GetWeather()
-		{
-			_logger.LogError("hello world!");
-			return Ok(_context.WeatherData.FirstOrDefault());
 		}
 
 		// /api/Realtime/1

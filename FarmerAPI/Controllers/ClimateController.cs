@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using FarmerAPI.Models;
+using FarmerAPI.Models.Weather;
+using FarmerAPI.Models.SQLite;
 using FarmerAPI.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace FarmerAPI.Controllers
 {
@@ -15,11 +17,26 @@ namespace FarmerAPI.Controllers
     public class ClimateController : Controller
     {
         private readonly WeatherContext _context;
-        public ClimateController(WeatherContext context)
+        private readonly GreenHouseContext _greenHouseContext;
+        private readonly ILogger<ClimateController> _logger;
+        public ClimateController(WeatherContext context,
+            GreenHouseContext greenHouseContext,
+            ILogger<ClimateController> logger)
         {
             _context = context;
+            _logger = logger;
+            _greenHouseContext = greenHouseContext;
         }
-                
+
+        // From MongoDB
+        [HttpGet("[action]")]
+        public ActionResult Temperature(DateTime? beginDate, DateTime? endDate)
+        {
+            _logger.LogError("hello sqlite!");
+            var result = _greenHouseContext.CwbData.FirstOrDefault(x=>x.Station.Name== "三芝");
+            return Ok(result);
+        }
+
         [HttpGet("[action]")]
         public IEnumerable<vmWeatherTemperature> Temperatures(int? StationId = 1, int SearchNum = 10000)
         {
@@ -35,7 +52,7 @@ namespace FarmerAPI.Controllers
                     DateFormatted = data.ObsTime.ToString("yyyy-MM-dd-HH-mm"),
                     TemperatureC = data.Temperature
                 });
-            };            
+            };
             return ReturnTemperature;           
         }
 
@@ -62,11 +79,11 @@ namespace FarmerAPI.Controllers
         public IEnumerable<vmWeatherStation> Stations()
         {
             //DB抓資料出來
-            IEnumerable<StationInfo> DbStationData = _context.StationInfo;
+            IEnumerable<Models.Weather.StationInfo> DbStationData = _context.StationInfo;
 
             List<vmWeatherStation> ReturnStations = new List<vmWeatherStation>();
 
-            foreach (StationInfo data in DbStationData)
+            foreach (Models.Weather.StationInfo data in DbStationData)
             {
                 ReturnStations.Add(new vmWeatherStation
                 {

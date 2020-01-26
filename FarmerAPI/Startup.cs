@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FarmerAPI.Models;
+using FarmerAPI.Models.Weather;
+using FarmerAPI.Models.SQLite;
 using Microsoft.AspNetCore.Mvc;
 using FarmerAPI.Filters;
 using System.Text;
@@ -74,7 +76,10 @@ namespace FarmerAPI
             ));
             services.AddDbContext<KMVContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("frudat")
-            ));                               
+            ));
+            services.AddDbContext<GreenHouseContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString("greenhouse")
+            ));
 
             //----加入cross-origin-request-sharing----//
             services.AddCors(options=>

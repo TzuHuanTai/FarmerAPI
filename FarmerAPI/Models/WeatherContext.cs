@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace FarmerAPI.Models
+namespace FarmerAPI.Models.Weather
 {
     public partial class WeatherContext : DbContext
     {
