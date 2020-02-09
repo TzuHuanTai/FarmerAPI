@@ -25,3 +25,8 @@
 2020-01-26 18:07:36.9004 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
 2020-01-26 18:11:49.8501 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
 2020-01-26 18:13:17.3203 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
+2020-02-09 20:55:24.1546 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
+2020-02-09 20:59:27.3290 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
+2020-02-09 20:59:37.5230 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
+2020-02-09 21:06:42.8855 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
+2020-02-09 22:19:30.3035 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: console
