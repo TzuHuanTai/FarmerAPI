@@ -22,9 +22,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Reflection;
+using Swashbuckle.Swagger;
+using Microsoft.OpenApi.Models;
 
 namespace FarmerAPI
 {
@@ -73,25 +74,20 @@ namespace FarmerAPI
                     // name: 攸關 SwaggerDocument 的 URL 位置。
                     name: "v1",
                     // info: 是用於 SwaggerDocument 版本資訊的顯示(內容非必填)。
-                    info: new Info
+                    info: new OpenApiInfo
                     {
                         Title = "RESTful API",
                         Version = "1.2.3",
                         Description = "This is ASP.NET Core RESTful API.",
-                        TermsOfService = "What is terms of service?",
-                        Contact = new Contact
+                        Contact = new OpenApiContact
                         {
-                            Name = "John Wu",
-                            Url = "https://blog.johnwu.cc"
-                        },
-                        License = new License
-                        {
-                            Name = "CC BY-NC-SA 4.0",
-                            Url = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                            Name = "Shayne Boyer",
+                            Email = "andy81719@gmail.com",
                         }
                     }
                 );
 
+                // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
