@@ -14,10 +14,7 @@ using FarmerAPI.Filters;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using FarmerAPI.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using FarmerAPI.Hubs;
-using FarmerAPI.Services;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -120,13 +117,6 @@ namespace FarmerAPI
                 options.AddPolicy("AllowAllOrigins",
                     builder =>
                     {
-                        //CORS responses only expose these 6 headers:
-                        //1.Cache-Control
-                        //2.Content-Language
-                        //3.Content-Type
-                        //4.Expires
-                        //5.Last-Modified
-                        //6.Pragma
                         builder.AllowAnyOrigin()
                                .AllowAnyMethod()
                                .AllowAnyHeader()
@@ -134,7 +124,7 @@ namespace FarmerAPI
                     });
             });
 
-			//----加入SignalR廣播----//
+			//----SignalR WebSocket----//
 			services.AddSignalR();
 
 			//----註冊認證，讓所有API Method可做權限控管----//
@@ -149,8 +139,8 @@ namespace FarmerAPI
             //AddSingleton failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
             //services.AddScoped<AuthorizationFilter>();
 
-			//----MongoDB----//
-			services.AddSingleton<WeatherService>();
+            //----Todo: camera video----//
+            //services.AddHostedService<>;
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

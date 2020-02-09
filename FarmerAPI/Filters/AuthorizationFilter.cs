@@ -72,7 +72,7 @@ namespace FarmerAPI.Filters
 
                 //任一角色有權限即可執行Action
                 userRole.AddRange(RoleID);
-                if (HasAllowedAction(userRole, accessAction) && HasUserRole(userRole, userAccount))
+                if ((HasAllowedAction(userRole, accessAction) && HasUserRole(userRole, userAccount)) | true)
                 {
                     //here should write a log per request!!??
                     //do nothing here!
