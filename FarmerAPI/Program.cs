@@ -18,11 +18,14 @@ namespace FarmerAPI
             BuildWebHost(args).Build().Run();
         }
 
-        public static IWebHostBuilder BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>().ConfigureLogging(logging=> {
-					logging.ClearProviders();
-					logging.SetMinimumLevel(LogLevel.Trace);
-				}).UseNLog();
+        public static IWebHostBuilder BuildWebHost(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                    .UseStartup<Startup>().ConfigureLogging(logging =>
+                    {
+                        logging.ClearProviders();
+                        logging.SetMinimumLevel(LogLevel.Trace);
+                    }).UseNLog();
+        }
     }
 }

@@ -18,6 +18,7 @@ namespace FarmerAPI.Models.SQLite
 
         public virtual DbSet<City> City { get; set; }
         public virtual DbSet<CwbData> CwbData { get; set; }
+        public virtual DbSet<Climate> Climate { get; set; }
         public virtual DbSet<StationInfo> StationInfo { get; set; }
 
         //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -43,6 +44,29 @@ namespace FarmerAPI.Models.SQLite
                 entity.Property(e => e.CityId).ValueGeneratedNever();
 
                 entity.Property(e => e.Name).HasColumnType("VARCHAR(10)");
+            });
+
+            modelBuilder.Entity<Climate>(entity =>
+            {
+                entity.ToTable("climate");
+
+                entity.HasKey(e => new { e.ObsTime });
+
+                entity.Property(e => e.ObsTime).HasColumnType("DATETIME");
+
+                entity.Property(e => e.Temperature)
+                    .HasColumnType("NUMERIC (3, 1)")
+                    .HasConversion(converter);
+
+                entity.Property(e => e.Rh)
+                   .HasColumnName("Rh")
+                   .HasColumnType("NUMERIC (3, 1)")
+                   .HasConversion(converter);
+
+                entity.Property(e => e.Lux)
+                   .HasColumnName("Lux")
+                   .HasColumnType("NUMERIC (7, 1)")
+                   .HasConversion(converter);
             });
 
             modelBuilder.Entity<CwbData>(entity =>
@@ -131,6 +155,14 @@ namespace FarmerAPI.Models.SQLite
                 entity.Property(e => e.Address).HasColumnType("VARCHAR (100)");
 
                 entity.Property(e => e.Name).HasColumnType("VARCHAR (10)");
+
+                entity.Property(e => e.Latitude)
+                    .HasColumnType("NUMERIC (18, 15)")
+                    .HasConversion(converter);
+
+                entity.Property(e => e.Longitude)
+                    .HasColumnType("NUMERIC (18, 15)")
+                    .HasConversion(converter);
 
                 entity.HasOne(d => d.City)
                     .WithMany(p => p.StationInfo)

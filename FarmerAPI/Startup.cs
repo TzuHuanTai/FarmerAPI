@@ -14,10 +14,7 @@ using FarmerAPI.Filters;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using FarmerAPI.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using FarmerAPI.Hubs;
-using FarmerAPI.Services;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -25,9 +22,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Reflection;
+using Swashbuckle.Swagger;
+using Microsoft.OpenApi.Models;
 
 namespace FarmerAPI
 {
@@ -76,25 +74,20 @@ namespace FarmerAPI
                     // name: 攸關 SwaggerDocument 的 URL 位置。
                     name: "v1",
                     // info: 是用於 SwaggerDocument 版本資訊的顯示(內容非必填)。
-                    info: new Info
+                    info: new OpenApiInfo
                     {
                         Title = "RESTful API",
                         Version = "1.2.3",
                         Description = "This is ASP.NET Core RESTful API.",
-                        TermsOfService = "What is terms of service?",
-                        Contact = new Contact
+                        Contact = new OpenApiContact
                         {
-                            Name = "John Wu",
-                            Url = "https://blog.johnwu.cc"
-                        },
-                        License = new License
-                        {
-                            Name = "CC BY-NC-SA 4.0",
-                            Url = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                            Name = "Shayne Boyer",
+                            Email = "andy81719@gmail.com",
                         }
                     }
                 );
 
+                // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
@@ -120,13 +113,6 @@ namespace FarmerAPI
                 options.AddPolicy("AllowAllOrigins",
                     builder =>
                     {
-                        //CORS responses only expose these 6 headers:
-                        //1.Cache-Control
-                        //2.Content-Language
-                        //3.Content-Type
-                        //4.Expires
-                        //5.Last-Modified
-                        //6.Pragma
                         builder.AllowAnyOrigin()
                                .AllowAnyMethod()
                                .AllowAnyHeader()
@@ -134,7 +120,7 @@ namespace FarmerAPI
                     });
             });
 
-			//----加入SignalR廣播----//
+			//----SignalR WebSocket----//
 			services.AddSignalR();
 
 			//----註冊認證，讓所有API Method可做權限控管----//
@@ -149,8 +135,8 @@ namespace FarmerAPI
             //AddSingleton failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
             //services.AddScoped<AuthorizationFilter>();
 
-			//----MongoDB----//
-			services.AddSingleton<WeatherService>();
+            //----Todo: camera video----//
+            //services.AddHostedService<>;
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
