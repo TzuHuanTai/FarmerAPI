@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FarmerAPI.Models.Weather
+namespace FarmerAPI.Models.SQLite
 {
-    public partial class WeatherData
+    public partial class CwbData
     {
         public int StationId { get; set; }
         public DateTime ObsTime { get; set; }
@@ -22,6 +22,6 @@ namespace FarmerAPI.Models.Weather
         public decimal? GlobalRad { get; set; }
         public decimal? Visb { get; set; }
 
-        public StationInfo StationIdNavigation { get; set; }
+        public virtual StationInfo Station { get; set; }
     }
 }

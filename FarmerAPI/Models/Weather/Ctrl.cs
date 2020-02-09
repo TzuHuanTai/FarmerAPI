@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FarmerAPI.Models
+namespace FarmerAPI.Models.Weather
 {
     public partial class Ctrl
     {

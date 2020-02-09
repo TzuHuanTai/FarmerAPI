@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FarmerAPI.Models.Weather
+namespace FarmerAPI.Models.SQLite
 {
     public partial class StationInfo
     {
         public StationInfo()
         {
-            WeatherData = new HashSet<WeatherData>();
+            CwbData = new HashSet<CwbData>();
         }
 
-        public int Id { get; set; }
+        public int StationId { get; set; }
         public string Name { get; set; }
         public int? CityId { get; set; }
         public string Address { get; set; }
 
-        public City City { get; set; }
-        public ICollection<WeatherData> WeatherData { get; set; }
+        public virtual City City { get; set; }
+        public virtual ICollection<CwbData> CwbData { get; set; }
     }
 }

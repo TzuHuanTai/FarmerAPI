@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FarmerAPI.Models.Weather
+namespace FarmerAPI.Models.SQLite
 {
     public partial class City
     {
@@ -10,9 +10,9 @@ namespace FarmerAPI.Models.Weather
             StationInfo = new HashSet<StationInfo>();
         }
 
-        public int Id { get; set; }
+        public int CityId { get; set; }
         public string Name { get; set; }
 
-        public ICollection<StationInfo> StationInfo { get; set; }
+        public virtual ICollection<StationInfo> StationInfo { get; set; }
     }
 }
