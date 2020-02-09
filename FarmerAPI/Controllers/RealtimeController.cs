@@ -11,9 +11,8 @@ using FarmerAPI.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using FarmerAPI.Hubs;
-using FarmerAPI.Services;
-using FarmerAPI.Models.MongoDB;
 using Microsoft.Extensions.Logging;
+using FarmerAPI.Models.SQLite;
 
 namespace FarmerAPI.Controllers
 {    
@@ -23,15 +22,12 @@ namespace FarmerAPI.Controllers
     {
         private readonly WeatherContext _context;
 		private readonly IHubContext<WeatherHub> _weatherHub;
-		private readonly WeatherService _weatherService;
 
 		public RealtimeController(WeatherContext context,
-			IHubContext<WeatherHub> weatherHub,
-			WeatherService weatherService)
+			IHubContext<WeatherHub> weatherHub)
         {
             _context = context;
 			_weatherHub = weatherHub;
-			_weatherService = weatherService;
 		}
 
 		// /api/Realtime/1
@@ -66,64 +62,64 @@ namespace FarmerAPI.Controllers
 		// This action at /api/Realtime/5 can bind form data (set individual parameters in body)
 		// Content-Type: application/json, x-www-form-urlencoded is working
 		// Insert/Update database realtime table through the recieved data on Raspberry pi DHT22 sensor.
-		[HttpPut("{StationId}")]
-        public async Task<ActionResult> PutRealtime([FromRoute] int StationId, [FromBody] Climate SensorData)
-        {
-			if (StationId != SensorData.StationId)
-			{
-				return BadRequest();
-			}
+		//[HttpPut("{StationId}")]
+  //      public async Task<ActionResult> PutRealtime([FromRoute] int StationId, [FromBody] Climate SensorData)
+  //      {
+		//	if (StationId != SensorData.StationId)
+		//	{
+		//		return BadRequest();
+		//	}
 
-			using(var transection = _context.Database.BeginTransaction())
-			{
-				if (StationExists(SensorData.StationId))
-				{
-					try
-					{
-						// save into RMSDB
-						RealTime TargetStation = _context.RealTime.SingleOrDefault(x => x.Id == SensorData.StationId);
-						_context.Entry(TargetStation).State = EntityState.Modified;
-						TargetStation.Temperature = SensorData.Temperature;
-						TargetStation.Rh = SensorData.RH;
-						TargetStation.Lux = SensorData.Lux;
-						_context.SaveChanges();
+		//	using(var transection = _context.Database.BeginTransaction())
+		//	{
+		//		if (StationExists(SensorData.StationId))
+		//		{
+		//			try
+		//			{
+		//				// save into RMSDB
+		//				RealTime TargetStation = _context.RealTime.SingleOrDefault(x => x.Id == SensorData.StationId);
+		//				_context.Entry(TargetStation).State = EntityState.Modified;
+		//				TargetStation.Temperature = SensorData.Temperature;
+		//				TargetStation.Rh = SensorData.RH;
+		//				TargetStation.Lux = SensorData.Lux;
+		//				_context.SaveChanges();
 
-						// save into mongoDb					
-						await PostRealtime(StationId, SensorData);
+		//				// save into mongoDb					
+		//				await PostRealtime(StationId, SensorData);
 
-						// Broadcast by SignalR
-						await _weatherHub.Clients.All.SendAsync("TempRhSensorReceived", SensorData);
-						transection.Commit();
-					}
-					catch (DbUpdateConcurrencyException)
-					{
-						return BadRequest("Rollback");
-					}
-				}
-				return Ok();
-			}
-        }
+		//				// Broadcast by SignalR
+		//				await _weatherHub.Clients.All.SendAsync("TempRhSensorReceived", SensorData);
+		//				transection.Commit();
+		//			}
+		//			catch (DbUpdateConcurrencyException)
+		//			{
+		//				return BadRequest("Rollback");
+		//			}
+		//		}
+		//		return Ok();
+		//	}
+  //      }
 
 		//新增資料進入MongoDB
-		[HttpPost("{StationId}")]
-		public async Task<ActionResult> PostRealtime([FromRoute] int StationId, [FromBody]Climate DetectedData)
-		{
-			if (StationId != DetectedData.StationId)
-			{
-				return BadRequest();
-			}
+		//[HttpPost("{StationId}")]
+		//public async Task<ActionResult> PostRealtime([FromRoute] int StationId, [FromBody]Climate DetectedData)
+		//{
+		//	if (StationId != DetectedData.StationId)
+		//	{
+		//		return BadRequest();
+		//	}
 
-			try
-			{
-				await _weatherService.Create(DetectedData);
-			}
-			catch(Exception ex)
-			{
-				throw ex;
-			}			
+		//	try
+		//	{
+		//		await _weatherService.Create(DetectedData);
+		//	}
+		//	catch(Exception ex)
+		//	{
+		//		throw ex;
+		//	}			
 
-			return NoContent();
-		}
+		//	return NoContent();
+		//}
 
 		// This action at /api/values/Realtime/5 can bind type of JSON in body directly because of [FromBody]
 		// Content-Type: application/json

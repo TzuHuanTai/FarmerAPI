@@ -33,7 +33,8 @@ namespace FarmerAPI.Controllers
         public ActionResult Temperature(DateTime? beginDate, DateTime? endDate)
         {
             _logger.LogError("hello sqlite!");
-            var result = _greenHouseContext.CwbData.FirstOrDefault(x=>x.Station.Name== "三芝");
+            //var result = _greenHouseContext.CwbData.FirstOrDefault(x=>x.Station.Name== "三芝");
+            Climate result = _greenHouseContext.Climate.FirstOrDefault();
             return Ok(result);
         }
 
