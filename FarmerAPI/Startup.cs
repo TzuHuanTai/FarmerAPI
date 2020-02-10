@@ -1,31 +1,22 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using FarmerAPI.Models;
-using FarmerAPI.Models.Weather;
-using FarmerAPI.Models.SQLite;
-using Microsoft.AspNetCore.Mvc;
-using FarmerAPI.Filters;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using FarmerAPI.ViewModels;
-using FarmerAPI.Hubs;
-using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
-using NLog.Web;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Reflection;
-using Swashbuckle.Swagger;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using FarmerAPI.Hubs;
+using FarmerAPI.ViewModels;
+using FarmerAPI.Models.SQLite;
+using FarmerAPI.Models.Weather;
 
 namespace FarmerAPI
 {
@@ -71,9 +62,7 @@ namespace FarmerAPI
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(
-                    // name: 攸關 SwaggerDocument 的 URL 位置。
                     name: "v1",
-                    // info: 是用於 SwaggerDocument 版本資訊的顯示(內容非必填)。
                     info: new OpenApiInfo
                     {
                         Title = "RESTful API",
@@ -81,7 +70,7 @@ namespace FarmerAPI
                         Description = "This is ASP.NET Core RESTful API.",
                         Contact = new OpenApiContact
                         {
-                            Name = "Shayne Boyer",
+                            Name = "Richard",
                             Email = "andy81719@gmail.com",
                         }
                     }
@@ -99,9 +88,6 @@ namespace FarmerAPI
             //----連接DB，原本ConnectString移到appsettings.json----//
             services.AddDbContext<WeatherContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("MyDB")
-            ));
-            services.AddDbContext<KMVContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("frudat")
             ));
             services.AddDbContext<GreenHouseContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("greenhouse")
@@ -164,7 +150,7 @@ namespace FarmerAPI
             {
                 c.SwaggerEndpoint(
                     // url: 需配合 SwaggerDoc 的 name。 "/swagger/{SwaggerDoc name}/swagger.json"
-                    url: "/swagger/v1/swagger.json",
+                    url: "../swagger/v1/swagger.json",
                     // description: 用於 Swagger UI 右上角選擇不同版本的 SwaggerDocument 顯示名稱使用。
                     name: "RESTful API v1.0.0"
                 );
