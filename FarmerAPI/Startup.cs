@@ -87,11 +87,11 @@ namespace FarmerAPI
 
             //----連接DB，原本ConnectString移到appsettings.json----//
             services.AddDbContext<WeatherContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("MyDB")
-            ));
+                options.UseSqlServer(Configuration["ConnectionString:MyDB"])
+            );
             services.AddDbContext<GreenHouseContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("greenhouse")
-            ));
+                options.UseSqlite(Configuration.GetConnectionString("greenhouse"))
+            );
 
             //----加入cross-origin-request-sharing----//
             services.AddCors(options=>

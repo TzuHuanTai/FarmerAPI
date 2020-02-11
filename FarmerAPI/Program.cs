@@ -2,6 +2,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Reflection;
 
 namespace FarmerAPI
 {
@@ -9,15 +14,37 @@ namespace FarmerAPI
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                    .UseStartup<Startup>().ConfigureLogging(logging =>
-                    {
-                        logging.ClearProviders();
-                        logging.SetMinimumLevel(LogLevel.Trace);
-                    }).UseNLog();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+         Host.CreateDefaultBuilder(args)
+             .ConfigureWebHostDefaults(webBuilder =>
+             {
+                 webBuilder.UseStartup<Startup>();
+             })
+             .ConfigureAppConfiguration((hostingContext, config) =>
+             {
+                 var env = hostingContext.HostingEnvironment;
+                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                 if (env.IsDevelopment())
+                 {
+                     config.AddUserSecrets<Startup>();
+                 }
+
+                 config.AddEnvironmentVariables();
+             }).ConfigureLogging(logging =>
+             {
+                 logging.ClearProviders();
+                 logging.SetMinimumLevel(LogLevel.Trace);
+             }).UseNLog();
+
+        //Host.CreateDefaultBuilder(args)
+        //            .UseStartup<Startup>().ConfigureLogging(logging =>
+        //            {
+        //                logging.ClearProviders();
+        //                logging.SetMinimumLevel(LogLevel.Trace);
+        //            }).UseNLog();
     }
 }
