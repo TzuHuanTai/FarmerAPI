@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using FarmerAPI.Models.Weather;
-using FarmerAPI.Models.SQLite;
-using FarmerAPI.ViewModels;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
+using FarmerAPI.ViewModels;
+using FarmerAPI.Models.SQLite;
+using FarmerAPI.Hubs;
 
 namespace FarmerAPI.Controllers
 {
@@ -16,39 +16,40 @@ namespace FarmerAPI.Controllers
     [Route("api/[controller]")]
     public class ClimateController : Controller
     {
-        private readonly WeatherContext _context;
-        private readonly GreenHouseContext _greenHouseContext;
+        private readonly GreenHouseContext _context;
+        private readonly IHubContext<SensorHub> _sensorHub;
         private readonly ILogger<ClimateController> _logger;
-        public ClimateController(WeatherContext context,
+        public ClimateController(
             GreenHouseContext greenHouseContext,
-            ILogger<ClimateController> logger)
+            IHubContext<SensorHub> sensorHub,
+            ILogger<ClimateController> logger
+        )
         {
-            _context = context;
             _logger = logger;
-            _greenHouseContext = greenHouseContext;
+            _context = greenHouseContext;
+            _sensorHub = sensorHub;
         }
 
         // From MongoDB
         [HttpGet("[action]")]
         public ActionResult Temperature(DateTime? beginDate, DateTime? endDate)
         {
-            _logger.LogError("hello sqlite!");
             //var result = _greenHouseContext.CwbData.FirstOrDefault(x=>x.Station.Name== "三芝");
-            Climate result = _greenHouseContext.Climate.FirstOrDefault();
+            Climate result = _context.Climate.FirstOrDefault();
             return Ok(result);
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<vmWeatherTemperature> Temperatures(int? StationId = 1, int SearchNum = 10000)
+        public IEnumerable<VmWeatherTemperature> Temperatures(int? StationId = 1, int SearchNum = 10000)
         {
             //DB抓資料出來
-            IEnumerable<WeatherData> DbWeatherData = _context.WeatherData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x=>x.ObsTime);
+            IEnumerable<CwbData> cwbData = _context.CwbData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x=>x.ObsTime);
 
-            List<vmWeatherTemperature> ReturnTemperature = new List<vmWeatherTemperature>();
+            List<VmWeatherTemperature> ReturnTemperature = new List<VmWeatherTemperature>();
 
-            foreach (WeatherData data in DbWeatherData)
+            foreach (CwbData data in cwbData)
             {
-                ReturnTemperature.Add(new vmWeatherTemperature
+                ReturnTemperature.Add(new VmWeatherTemperature
                 {
                     DateFormatted = data.ObsTime.ToString("yyyy-MM-dd-HH-mm"),
                     TemperatureC = data.Temperature
@@ -58,16 +59,16 @@ namespace FarmerAPI.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<vmWeatherHumidities> Humidities(int? StationId = 1, int SearchNum = 10000)
+        public IEnumerable<VmWeatherHumidities> Humidities(int? StationId = 1, int SearchNum = 10000)
         {
             //DB抓資料出來
-            IEnumerable<WeatherData> DbWeatherData = _context.WeatherData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x => x.ObsTime);
+            IEnumerable<CwbData> cwbData = _context.CwbData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x => x.ObsTime);
 
-            List<vmWeatherHumidities> ReturnHumidities = new List<vmWeatherHumidities>();
+            List<VmWeatherHumidities> ReturnHumidities = new List<VmWeatherHumidities>();
 
-            foreach (WeatherData data in DbWeatherData)
+            foreach (CwbData data in cwbData)
             {
-                ReturnHumidities.Add(new vmWeatherHumidities
+                ReturnHumidities.Add(new VmWeatherHumidities
                 {
                     DateFormatted = data.ObsTime.ToString("yyyy-MM-dd-HH-mm"),
                     RelativeHumidities = data.Rh
@@ -76,27 +77,42 @@ namespace FarmerAPI.Controllers
             return ReturnHumidities;
         }
 
-        [HttpGet("[action]")]
-        public IEnumerable<vmWeatherStation> Stations()
+        [HttpPost("{StationId}")]
+        public async Task<ActionResult> PostClimate([FromRoute] int StationId, [FromBody]Climate SensorData)
         {
-            //DB抓資料出來
-            IEnumerable<Models.Weather.StationInfo> DbStationData = _context.StationInfo;
-
-            List<vmWeatherStation> ReturnStations = new List<vmWeatherStation>();
-
-            foreach (Models.Weather.StationInfo data in DbStationData)
+            if (!ModelState.IsValid)
             {
-                ReturnStations.Add(new vmWeatherStation
+                return BadRequest(ModelState);
+            }
+
+            using var transection = _context.Database.BeginTransaction();
+            try
+            {
+                var realtimeData = new VmRealtime
                 {
-                    StationId = data.Id,
-                    StationName = data.Name
-                });
-            };
-            return ReturnStations;
+                    StationId = StationId,
+                    DateFormatted = SensorData.ObsTime,
+                    Temperature = SensorData.Temperature,
+                    RH = SensorData.Rh,
+                    Lux = SensorData.Lux
+                };
+
+                await _sensorHub.Clients.All.SendAsync("SensorDetected", realtimeData);
+
+                // 小溫室本身資料要存檔
+                if (StationId == 0)
+                {
+                    _context.Climate.Add(SensorData);
+                    await _context.SaveChangesAsync();
+                    transection.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
         }
-
-
-
-      
     }
 }

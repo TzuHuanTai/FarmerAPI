@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:4063/",
+      "applicationUrl": "http://localhost:4065/",
       //"sslPort": 44321
     }
   },
@@ -19,11 +19,11 @@
     "FarmerAPI": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "api/StationInfo",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://127.0.0.1:4064/"
+      "applicationUrl": "http://127.0.0.1:4066/"
     }
   }
 }

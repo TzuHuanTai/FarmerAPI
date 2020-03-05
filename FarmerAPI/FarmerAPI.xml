@@ -4,13 +4,6 @@
         <name>FarmerAPI</name>
     </assembly>
     <members>
-        <member name="M:FarmerAPI.Controllers.ActionsController.GetActionTree">
-            <summary>
-            查詢使用者清單
-            </summary>
-            <param name="q">查詢使用者名稱</param>
-            <returns>使用者清單</returns>
-        </member>
         <member name="F:FarmerAPI.ViewModels.JwtClaimTypes.Subject">
             <summary>Unique Identifier for the End-User at the Issuer.</summary>
         </member>
