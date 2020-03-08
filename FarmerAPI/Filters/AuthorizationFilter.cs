@@ -23,8 +23,6 @@ namespace FarmerAPI.Filters
 
             string authHeader = context.HttpContext.Request.Headers["Authorization"];
 
-            authHeader = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJHZW5lcmFsIiwiaXNzIjoi55CG5p-l5b635LqC5pCe5pyJ6ZmQ5YWs5Y-4IiwiaWQiOiJwaSIsInJvbGVJZCI6IjUiLCJuYmYiOjE1Mjg2ODc3MDEsImV4cCI6MTc0OTYxMjUwMSwiaWF0IjoxNTI4Njg3NzAxfQ.MJWYrbPgG361F4nXwjFdTRdPdGcQ3ff6A6_4TcF24HY";
-            
             if (authHeader != null)
             {
                 request.Headers.Add("Authorization", authHeader);

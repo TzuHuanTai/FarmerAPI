@@ -46,6 +46,8 @@ namespace FarmerAPI
                         }
                     }
                 );
+                //c.DocInclusionPredicate((_, api) => false);
+                c.ResolveConflictingActions(c => c.GetEnumerator().Current);
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -53,7 +55,7 @@ namespace FarmerAPI
             });
 
             services.AddHttpClient("systemAuth", c => {
-                c.BaseAddress = new Uri("http://localhost:4064/");
+                c.BaseAddress = new Uri(Configuration["Url:SystemAuth"]);
             });
 
             //----抓封包資訊、client IP需要註冊HttpContext功能----//
@@ -124,6 +126,7 @@ namespace FarmerAPI
                     // description: 用於 Swagger UI 右上角選擇不同版本的 SwaggerDocument 顯示名稱使用。
                     name: "RESTful API v1.0.0"
                 );
+                c.DocumentTitle = "Small Greenhouse API";
             });
 
             //----請求進入MVC，放在所有流程最後面----//

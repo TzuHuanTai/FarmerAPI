@@ -20,6 +20,10 @@ namespace FarmerAPI.Controllers
         }
 
         [HttpGet]
+        /// <summary>
+        /// Get StationInfo.
+        /// </summary>
+        /// <param name="id"></param> 
         public IEnumerable<StationInfo> GetStationInfo()
         {
             return _greenHouseContext.StationInfo;
