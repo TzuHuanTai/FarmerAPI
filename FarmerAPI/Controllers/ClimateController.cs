@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
+using FarmerAPI.Hubs;
 using FarmerAPI.ViewModels;
 using FarmerAPI.Models.SQLite;
-using FarmerAPI.Hubs;
 
 namespace FarmerAPI.Controllers
 {
@@ -43,11 +43,14 @@ namespace FarmerAPI.Controllers
         public IEnumerable<VmWeatherTemperature> Temperatures(int? StationId = 1, int SearchNum = 10000)
         {
             //DB抓資料出來
-            IEnumerable<CwbData> cwbData = _context.CwbData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x=>x.ObsTime);
+            var cwbData = _context.CwbData
+                .Where(x => x.StationId == StationId)
+                .Select(x=>new {x.ObsTime, x.Temperature })
+                .Take(SearchNum).OrderBy(x=>x.ObsTime);
 
             List<VmWeatherTemperature> ReturnTemperature = new List<VmWeatherTemperature>();
 
-            foreach (CwbData data in cwbData)
+            foreach (var data in cwbData)
             {
                 ReturnTemperature.Add(new VmWeatherTemperature
                 {
@@ -55,18 +58,21 @@ namespace FarmerAPI.Controllers
                     TemperatureC = data.Temperature
                 });
             };
-            return ReturnTemperature;           
+            return ReturnTemperature;
         }
 
         [HttpGet("[action]")]
         public IEnumerable<VmWeatherHumidities> Humidities(int? StationId = 1, int SearchNum = 10000)
         {
             //DB抓資料出來
-            IEnumerable<CwbData> cwbData = _context.CwbData.Where(x => x.StationId == StationId).Take(SearchNum).OrderBy(x => x.ObsTime);
+            var cwbData = _context.CwbData
+                .Where(x => x.StationId == StationId)
+                .Select(x => new { x.ObsTime, x.Rh })
+                .Take(SearchNum).OrderBy(x => x.ObsTime);
 
             List<VmWeatherHumidities> ReturnHumidities = new List<VmWeatherHumidities>();
 
-            foreach (CwbData data in cwbData)
+            foreach (var data in cwbData)
             {
                 ReturnHumidities.Add(new VmWeatherHumidities
                 {
