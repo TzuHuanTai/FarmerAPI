@@ -20,7 +20,9 @@ namespace FarmerAPI
                     {
                         logging.ClearProviders();
                         logging.SetMinimumLevel(LogLevel.Trace);
-                    }).UseNLog();
+                    })
+                    .UseUrls("http://0.0.0.0:4066/")
+                    .UseNLog();
                 });
     }
 }

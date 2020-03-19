@@ -44,7 +44,7 @@ namespace FarmerAPI.Controllers
             }
         }
 
-        private void DetectRecievedData()
+        protected void DetectRecievedData()
         {
             connection.On<VmRealtime>("SensorDetected", async (DetectedData) =>
             {
@@ -52,7 +52,7 @@ namespace FarmerAPI.Controllers
             });
         }
 
-        private Task<VmRealtime> IsRealtimeStationExistsAsync(int StationId)
+        protected Task<VmRealtime> IsRealtimeStationExistsAsync(int StationId)
         {
             return Task.Run(() =>
             {
@@ -60,7 +60,7 @@ namespace FarmerAPI.Controllers
             });
         }
 
-        public Task SetRealtimeListAsync(List<VmRealtime> realtimeList, VmRealtime DetectedData)
+        protected Task SetRealtimeListAsync(List<VmRealtime> realtimeList, VmRealtime DetectedData)
         {
             return Task.Run(async () =>
             {

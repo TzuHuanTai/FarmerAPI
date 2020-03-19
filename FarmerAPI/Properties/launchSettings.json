@@ -22,8 +22,7 @@
       "launchUrl": "api/StationInfo",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://127.0.0.1:4066/"
+      }
     }
   }
 }

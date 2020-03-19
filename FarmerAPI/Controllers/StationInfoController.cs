@@ -143,7 +143,7 @@ namespace FarmerAPI.Controllers
             return NoContent();
         }
 
-        private bool StationInfoExists(int StationId)
+        protected bool StationInfoExists(int StationId)
         {
             return _greenHouseContext.StationInfo.Any(e => e.StationId == StationId);
         }

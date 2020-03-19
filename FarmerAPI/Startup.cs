@@ -30,30 +30,6 @@ namespace FarmerAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc(
-                    name: "v1",
-                    info: new OpenApiInfo
-                    {
-                        Title = "RESTful API",
-                        Version = "1.2.3",
-                        Description = "This is ASP.NET Core RESTful API in small green house.",
-                        Contact = new OpenApiContact
-                        {
-                            Name = "Richard",
-                            Email = "andy81719@gmail.com",
-                        }
-                    }
-                );
-                //c.DocInclusionPredicate((_, api) => false);
-                c.ResolveConflictingActions(c => c.GetEnumerator().Current);
-                // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
-            });
-
             services.AddHttpClient("systemAuth", c => {
                 c.BaseAddress = new Uri(Configuration["Url:SystemAuth"]);
             });
@@ -90,7 +66,28 @@ namespace FarmerAPI
 
             //----Todo: camera video----//
             //services.AddHostedService<>;
-		}
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(
+                    name: "v1",
+                    info: new OpenApiInfo
+                    {
+                        Title = "RESTful API",
+                        Version = "1.2.3",
+                        Description = "This is ASP.NET Core RESTful API in small green house.",
+                        Contact = new OpenApiContact
+                        {
+                            Name = "Richard Tai",
+                            Email = "andy81719@gmail.com",
+                        }
+                    }
+                );
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
@@ -112,12 +109,7 @@ namespace FarmerAPI
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint(
-                    // url: 需配合 SwaggerDoc 的 name。 "/swagger/{SwaggerDoc name}/swagger.json"
-                    url: "../swagger/v1/swagger.json",
-                    // description: 用於 Swagger UI 右上角選擇不同版本的 SwaggerDocument 顯示名稱使用。
-                    name: "RESTful API v1.0.0"
-                );
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "RESTful API v1.0.0");
                 c.DocumentTitle = "Small Greenhouse API";
             });
 
