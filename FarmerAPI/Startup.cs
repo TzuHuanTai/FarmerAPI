@@ -15,6 +15,7 @@ using FarmerAPI.Hubs;
 using FarmerAPI.Filters;
 using FarmerAPI.Controllers;
 using FarmerAPI.Models.SQLite;
+using System.Net.Http;
 
 namespace FarmerAPI
 {
@@ -32,6 +33,11 @@ namespace FarmerAPI
         {
             services.AddHttpClient("systemAuth", c => {
                 c.BaseAddress = new Uri(Configuration["Url:SystemAuth"]);
+            }).ConfigurePrimaryHttpMessageHandler(h =>
+            {
+                var handler = new HttpClientHandler();
+                handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+                return handler;
             });
 
             //----抓封包資訊、client IP需要註冊HttpContext功能----//

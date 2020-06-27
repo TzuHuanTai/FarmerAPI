@@ -11,17 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\**" />
-    <Compile Remove="Templates\**" />
-    <Content Remove="Services\**" />
-    <Content Remove="Templates\**" />
-    <EmbeddedResource Remove="Services\**" />
-    <EmbeddedResource Remove="Templates\**" />
-    <None Remove="Services\**" />
-    <None Remove="Templates\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -42,6 +31,15 @@
 
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="backend.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="GreenHouse.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

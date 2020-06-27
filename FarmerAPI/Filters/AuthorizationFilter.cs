@@ -39,7 +39,7 @@ namespace FarmerAPI.Filters
             }
         }
 
-        public void FailAuthorize(AuthorizationFilterContext context)
+        private void FailAuthorize(AuthorizationFilterContext context)
         {
             #region 其他回傳方式
             //context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
+using System.Net;
 
 namespace FarmerAPI
 {
@@ -16,13 +17,22 @@ namespace FarmerAPI
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().ConfigureLogging(logging =>
-                    {
-                        logging.ClearProviders();
-                        logging.SetMinimumLevel(LogLevel.Trace);
-                    })
-                    .UseUrls("http://0.0.0.0:4066/")
-                    .UseNLog();
+                    webBuilder.UseStartup<Startup>()
+                        .UseKestrel(options =>
+                        {
+                            options.Listen(IPAddress.Any, 6080);
+                            options.Listen(IPAddress.Any, 6443, listenOptions =>
+                            {
+                                listenOptions.UseHttps("backend.pfx", "2ooixuui");
+                            });
+                        })
+                        .UseUrls("https://0.0.0.0:6443")
+                        .ConfigureLogging(logging =>
+                        {
+                            logging.ClearProviders();
+                            logging.SetMinimumLevel(LogLevel.Trace);
+                        })
+                        .UseNLog();
                 });
     }
 }
