@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using FarmerAPI.ViewModels;
 using Microsoft.AspNetCore.SignalR;
-using FarmerAPI.ViewModels;
+using System.Threading.Tasks;
 
 namespace FarmerAPI.Hubs
 {
-    public class SensorHub : Hub
+	public class SensorHub : Hub
 	{
 		public async Task SensorDetected(VmRealtime DetectedData)
 		{
