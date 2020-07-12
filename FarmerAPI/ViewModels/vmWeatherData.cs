@@ -7,15 +7,10 @@ namespace FarmerAPI.ViewModels
         
     }
 
-    public class VmWeatherTemperature
+    public class CwbClimate
     {
         public string DateFormatted { get; set; }
         public decimal? TemperatureC { get; set; }
-    }
-
-    public class VmWeatherHumidities
-    {
-        public string DateFormatted { get; set; }
         public decimal? RelativeHumidities { get; set; }
     }
 

@@ -32,55 +32,22 @@ namespace FarmerAPI.Controllers
 
         // From MongoDB
         [HttpGet("[action]")]
-        public ActionResult Temperature(DateTime? beginDate, DateTime? endDate)
+        public IEnumerable<Climate> GreenHouse(int SearchNum = 10000)
         {
-            //var result = _greenHouseContext.CwbData.FirstOrDefault(x=>x.Station.Name== "三芝");
-            Climate result = _context.Climate.FirstOrDefault();
-            return Ok(result);
+            var result = _context.Climate
+                .Skip(Math.Max(0, _context.Climate.Count() - SearchNum));
+            return result;
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<VmWeatherTemperature> Temperatures(int? StationId = 1, int SearchNum = 10000)
+        public IEnumerable<Climate> Cwb(int? StationId = 1, int SearchNum = 10000)
         {
-            //DB抓資料出來
-            var cwbData = _context.CwbData
-                .Where(x => x.StationId == StationId)
-                .Select(x=>new {x.ObsTime, x.Temperature })
-                .Take(SearchNum).OrderBy(x=>x.ObsTime);
-
-            List<VmWeatherTemperature> ReturnTemperature = new List<VmWeatherTemperature>();
-
-            foreach (var data in cwbData)
-            {
-                ReturnTemperature.Add(new VmWeatherTemperature
-                {
-                    DateFormatted = data.ObsTime.ToString("yyyy-MM-dd-HH-mm"),
-                    TemperatureC = data.Temperature
-                });
-            };
-            return ReturnTemperature;
-        }
-
-        [HttpGet("[action]")]
-        public IEnumerable<VmWeatherHumidities> Humidities(int? StationId = 1, int SearchNum = 10000)
-        {
-            //DB抓資料出來
-            var cwbData = _context.CwbData
-                .Where(x => x.StationId == StationId)
-                .Select(x => new { x.ObsTime, x.Rh })
-                .Take(SearchNum).OrderBy(x => x.ObsTime);
-
-            List<VmWeatherHumidities> ReturnHumidities = new List<VmWeatherHumidities>();
-
-            foreach (var data in cwbData)
-            {
-                ReturnHumidities.Add(new VmWeatherHumidities
-                {
-                    DateFormatted = data.ObsTime.ToString("yyyy-MM-dd-HH-mm"),
-                    RelativeHumidities = data.Rh
-                });
-            };
-            return ReturnHumidities;
+            var targetCwbData = _context.CwbData
+                .Where(x => x.StationId == StationId);
+            var result = targetCwbData
+                .Skip(Math.Max(0, targetCwbData.Count() - SearchNum))
+                .Select(x => new Climate { ObsTime = x.ObsTime, Temperature = x.Temperature, Rh = x.Rh });
+            return result;
         }
 
         [HttpPost("{StationId}")]

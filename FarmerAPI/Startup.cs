@@ -33,45 +33,34 @@ namespace FarmerAPI
         {
             services.AddHttpClient("systemAuth", c => {
                 c.BaseAddress = new Uri(Configuration["Url:SystemAuth"]);
-            }).ConfigurePrimaryHttpMessageHandler(h =>
-            {
-                var handler = new HttpClientHandler();
-                handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            }).ConfigurePrimaryHttpMessageHandler(h => {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
                 return handler;
             });
 
-            //----抓封包資訊、client IP需要註冊HttpContext功能----//
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            //----連接DB，原本ConnectString移到appsettings.json----//
             services.AddDbContext<GreenHouseContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("greenhouse")
             ));
 
-            //----加入cross-origin-request-sharing----//
             services.AddCors();
-
-			//----SignalR WebSocket----//
 			services.AddSignalR();
-
-            services.AddSingleton<RealtimeController, RealtimeController>();
-
             services.AddMvc().AddControllersAsServices();
-
-			//----註冊認證，讓所有API Method可做權限控管----//
-			services.AddControllers(Configuration =>
-            {
-                //再全域註冊Filter，ServiceFilterAttribute方式會被解析要用dependency injection，這樣就可在filter使用db功能
-                Configuration.Filters.Add(new ServiceFilterAttribute(typeof(AuthorizationFilter)));
-            });
-
             //----Filter----//
             //註冊，若只個別註冊需自行在controll加上標籤[ServiceFilter(typeof(AuthorizationFilter))]
             //AddSingleton failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
             services.AddScoped<AuthorizationFilter>();
+            services.AddSingleton<RealtimeController, RealtimeController>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            //----Todo: camera video----//
-            //services.AddHostedService<>;
+			//----註冊認證，讓所有API Method可做權限控管----//
+			services.AddControllers(Configuration => {
+                //再全域註冊Filter，ServiceFilterAttribute方式會被解析要用dependency injection，這樣就可在filter使用db功能
+                Configuration.Filters.Add(new ServiceFilterAttribute(typeof(AuthorizationFilter)));
+                Configuration.MaxIAsyncEnumerableBufferLimit = 100000;
+            });            
 
             services.AddSwaggerGen(c =>
             {
