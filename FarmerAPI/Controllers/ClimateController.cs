@@ -66,7 +66,7 @@ namespace FarmerAPI.Controllers
 					StationId = StationId,
 					DateFormatted = SensorData.ObsTime,
 					Temperature = SensorData.Temperature,
-					RH = SensorData.Rh,
+					RH = SensorData.Rh >= 0 && SensorData.Rh <= 100 ? SensorData.Rh : null,
 					Lux = SensorData.Lux
 				};
 
