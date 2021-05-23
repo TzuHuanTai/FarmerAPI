@@ -1,16 +1,13 @@
 # Farmer API
----
 This project need [auth service](https://github.com/TzyHuan/SystemAuth) issued jwt for user.
 
 As long as the request is recieved, the `AuthorizationFilter.cs` filters will redirect to the SystemAuth url set in `appsettings.json` to check whether the jwt is valid.
 
 ## Feature
----
 * APIs: Let [detector](https://github.com/TzyHuan/RaspberryPi_Weather) save data into sqlite, and [web](https://github.com/TzyHuan/FarmerWeb) can search historical weather data.
 * Websocket: Broadcast detected values from sensors by SignalR.
 
 ## Deploy
----
 ### Prepare
 
 [Install .NET on Linux](https://docs.microsoft.com/zh-tw/dotnet/core/install/linux)
