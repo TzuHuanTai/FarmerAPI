@@ -18,6 +18,7 @@ namespace FarmerAPI.Controllers
 		private readonly GreenHouseContext _context;
 		private readonly IHubContext<SensorHub> _sensorHub;
 		private readonly ILogger<ClimateController> _logger;
+		protected List<Climate> buffer;
 
 		public ClimateController(
 			GreenHouseContext greenHouseContext,
@@ -28,6 +29,7 @@ namespace FarmerAPI.Controllers
 			_logger = logger;
 			_context = greenHouseContext;
 			_sensorHub = sensorHub;
+			buffer = new List<Climate>();
 		}
 
 		// From MongoDB
@@ -57,6 +59,26 @@ namespace FarmerAPI.Controllers
 			{
 				return BadRequest(ModelState);
 			}
+
+			if (SensorData.Rh == null || SensorData.Temperature == null || SensorData.Rh < 0 || SensorData.Rh > 100 || SensorData.Temperature < -40 || SensorData.Temperature > 80)
+			{
+				return BadRequest("Noised data");
+			}
+
+			if(buffer.Count > 0)
+			{
+				var avg_temperature = (buffer.Select(x => x.Temperature).Sum() / buffer.Count);
+				var avg_Rh = buffer.Select(x => x.Rh).Sum() / buffer.Count;
+				if ((SensorData.Temperature - avg_temperature) / avg_temperature > (decimal)0.3 && (SensorData.Rh - avg_Rh) / avg_Rh > (decimal)0.3)
+				{
+					return BadRequest("Data with too much amplitude");
+				}
+				while (buffer.Count > 10)
+				{
+					buffer.RemoveAt(0);
+				}
+			}
+			buffer.Add(SensorData);
 
 			using var transection = _context.Database.BeginTransaction();
 			try

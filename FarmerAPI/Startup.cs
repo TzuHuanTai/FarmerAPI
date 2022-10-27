@@ -45,7 +45,7 @@ namespace FarmerAPI
 
 			services.AddDbContext<GreenHouseContext>(options =>
 				options.UseSqlite(Configuration.GetConnectionString("greenhouse")
-			));
+			), ServiceLifetime.Singleton, ServiceLifetime.Singleton);
 
 			services.AddCors();
 			services.AddSignalR();
@@ -54,6 +54,7 @@ namespace FarmerAPI
 			//註冊，若只個別註冊需自行在controll加上標籤[ServiceFilter(typeof(AuthorizationFilter))]
 			//AddSingleton failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
 			services.AddScoped<AuthorizationFilter>();
+			services.AddSingleton<ClimateController, ClimateController>();
 			services.AddSingleton<RealtimeController, RealtimeController>();
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
