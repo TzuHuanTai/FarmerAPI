@@ -2,6 +2,7 @@
 using FarmerAPI.Filters;
 using FarmerAPI.Hubs;
 using FarmerAPI.Models.SQLite;
+using FarmerAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +46,7 @@ namespace FarmerAPI
 
 			services.AddDbContext<GreenHouseContext>(options =>
 				options.UseSqlite(Configuration.GetConnectionString("greenhouse")
-			), ServiceLifetime.Singleton, ServiceLifetime.Singleton);
+			));
 
 			services.AddCors();
 			services.AddSignalR();
@@ -53,8 +54,8 @@ namespace FarmerAPI
 			//----Filter----//
 			//註冊，若只個別註冊需自行在controll加上標籤[ServiceFilter(typeof(AuthorizationFilter))]
 			//AddSingleton failed: AddSingleton呼叫不會new, AddTransient、AddScoped呼叫方式會new
-			services.AddScoped<AuthorizationFilter>();
-			services.AddSingleton<ClimateController, ClimateController>();
+			//services.AddScoped<AuthorizationFilter>();
+			services.AddSingleton<SharedService, SharedService>();
 			services.AddSingleton<RealtimeController, RealtimeController>();
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -62,7 +63,7 @@ namespace FarmerAPI
 			services.AddControllers(Configuration =>
 			{
 				//再全域註冊Filter，ServiceFilterAttribute方式會被解析要用dependency injection，這樣就可在filter使用db功能
-				Configuration.Filters.Add(new ServiceFilterAttribute(typeof(AuthorizationFilter)));
+				//Configuration.Filters.Add(new ServiceFilterAttribute(typeof(AuthorizationFilter)));
 				Configuration.MaxIAsyncEnumerableBufferLimit = 100000;
 			});
 

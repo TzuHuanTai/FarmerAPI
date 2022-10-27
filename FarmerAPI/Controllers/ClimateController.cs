@@ -1,10 +1,12 @@
 ﻿using FarmerAPI.Hubs;
 using FarmerAPI.Models.SQLite;
+using FarmerAPI.Services;
 using FarmerAPI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,19 +19,17 @@ namespace FarmerAPI.Controllers
 	{
 		private readonly GreenHouseContext _context;
 		private readonly IHubContext<SensorHub> _sensorHub;
-		private readonly ILogger<ClimateController> _logger;
-		protected List<Climate> buffer;
+		protected ConcurrentQueue<Climate> buffer;
 
 		public ClimateController(
 			GreenHouseContext greenHouseContext,
 			IHubContext<SensorHub> sensorHub,
-			ILogger<ClimateController> logger
+			SharedService shared
 		)
 		{
-			_logger = logger;
 			_context = greenHouseContext;
 			_sensorHub = sensorHub;
-			buffer = new List<Climate>();
+			buffer = shared.climate_buffer;
 		}
 
 		// From MongoDB
@@ -75,10 +75,11 @@ namespace FarmerAPI.Controllers
 				}
 				while (buffer.Count > 10)
 				{
-					buffer.RemoveAt(0);
+					Climate removed;
+					buffer.TryDequeue(out removed);
 				}
 			}
-			buffer.Add(SensorData);
+			buffer.Enqueue(SensorData);
 
 			using var transection = _context.Database.BeginTransaction();
 			try
