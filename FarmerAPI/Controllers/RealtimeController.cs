@@ -21,7 +21,7 @@ namespace FarmerAPI.Controllers
 			_realtimeList = new List<VmRealtime>();
 
 			connection = new HubConnectionBuilder()
-				.WithUrl(_config["Url:SignalR"])
+				.WithUrl(_config["Url:SensorHub"])
 				.Build();
 
 			connection.StartAsync().ContinueWith(t => DetectRecievedData());

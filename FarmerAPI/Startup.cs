@@ -114,6 +114,7 @@ namespace FarmerAPI
 			//----請求進入MVC，放在所有流程最後面----//
 			app.UseEndpoints(endpoints =>
 			{
+				endpoints.MapHub<SignalingServer>("/SignalingServer");
 				endpoints.MapHub<SensorHub>("/SensorHub");
 				endpoints.MapControllers();
 			});
