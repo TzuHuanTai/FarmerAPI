@@ -10,49 +10,43 @@ namespace FarmerAPI.Hubs
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, SignalingGroup.Client);
-            await ClientDisonnected(Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task ServerJoin(string groupName)
+        public async Task JoinAsServer()
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            await Groups.AddToGroupAsync(Context.ConnectionId, SignalingGroup.Server);
         }
 
-        public async Task ClientJoin(string groupName, string cameraId)
+        public async Task JoinAsClient()
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            await ClientConnected(Context.ConnectionId, cameraId);
+            await Groups.AddToGroupAsync(Context.ConnectionId, SignalingGroup.Client);
+            await ConnectedClient(Context.ConnectionId);
         }
 
-        public async Task ClientDisonnected(string connectionId)
+        public async Task ConnectedClient(string connectionId)
         {
-            await Clients.Group(SignalingGroup.Server).SendAsync(SignalingMethod.ClientDisonnected, connectionId);
+            await Clients.Group(SignalingGroup.Server).SendAsync(SignalingMethod.ConnectedClient, connectionId);
         }
 
-        public async Task ClientConnected(string connectionId, string cameraId)
+        public async Task OfferSDP(RtcSessionDescription description)
         {
-            await Clients.Group(SignalingGroup.Server).SendAsync(SignalingMethod.ClientConnected, connectionId, cameraId);
+            await Clients.Group(SignalingGroup.Server).SendAsync(SignalingMethod.OfferSDP, description);
         }
 
-        public async Task OfferSDP(string connectionId, RtcSessionDescription description)
+        public async Task AnswerSDP(string connectionId, RtcSessionDescription description)
         {
-            await Clients.Client(connectionId).SendAsync(SignalingMethod.OfferSDP, description);
+            await Clients.Client(connectionId).SendAsync(SignalingMethod.AnswerSDP, description);
         }
 
-        public async Task AnswerSDP(RtcSessionDescription desc)
+        public async Task OfferICE(RtcIceCandidate candidate)
         {
-            await Clients.Group(SignalingGroup.Server).SendAsync(SignalingMethod.AnswerSDP, desc);
+            await Clients.Group(SignalingGroup.Server).SendAsync(SignalingMethod.OfferICE, candidate);
         }
 
-        public async Task OfferICE(string connectionId, RtcIceCandidate candidate)
+        public async Task AnswerICE(string connectionId, RtcIceCandidate candidate)
         {
-            await Clients.Client(connectionId).SendAsync(SignalingMethod.OfferICE, candidate);
-        }
-
-        public async Task AnswerICE(RtcIceCandidate candidate)
-        {
-            await Clients.Group(SignalingGroup.Server).SendAsync(SignalingMethod.AnswerICE, candidate);
+            await Clients.Client(connectionId).SendAsync(SignalingMethod.AnswerICE, candidate);
         }
     }
 }

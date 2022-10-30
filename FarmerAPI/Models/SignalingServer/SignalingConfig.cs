@@ -9,10 +9,6 @@ namespace FarmerAPI.Models.SignalingServer
 
     public static class SignalingMethod
     {
-        public static string ServerJoin => "ServerJoin";
-
-        public static string ClientJoin => "ClientJoin";
-
         public static string OfferSDP => "OfferSDP";
 
         public static string AnswerSDP => "AnswerSDP";
@@ -21,9 +17,7 @@ namespace FarmerAPI.Models.SignalingServer
 
         public static string AnswerICE => "AnswerICE";
 
-        public static string ClientConnected => "ClientConnected";
-
-        public static string ClientDisonnected => "ClientDisonnected";
+        public static string ConnectedClient => "ConnectedClient";
     }
 
     public static class SignalingGroup
