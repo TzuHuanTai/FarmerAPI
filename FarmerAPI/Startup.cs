@@ -17,6 +17,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using VisionPicking.BackgroundServices;
 
 namespace FarmerAPI
 {
@@ -58,6 +59,7 @@ namespace FarmerAPI
 			services.AddSingleton<SharedService, SharedService>();
 			services.AddSingleton<RealtimeController, RealtimeController>();
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddHostedService<DataArchivingWorker>();
 
 			//----註冊認證，讓所有API Method可做權限控管----//
 			services.AddControllers(Configuration =>
